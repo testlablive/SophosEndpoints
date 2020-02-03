@@ -83,7 +83,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-         Tags = @('Sophos', 'UTM', 'Endpoints', 'Office 365', 'Azure', 'Network', 'Exception')
+         Tags = @('Sophos', 'UTM', 'Endpoints', 'Office365', 'Azure', 'Network', 'Exception')
 
         # A URL to the license for this module.
          LicenseUri = 'https://github.com/testlablive/SophosEndpoints/blob/master/LICENSE'
