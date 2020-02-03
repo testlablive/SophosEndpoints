@@ -1,4 +1,5 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/fwbrg250u8nc0rxc/branch/master?svg=true)](https://ci.appveyor.com/project/testlablive/sophosendpoints/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/btgp1wgt0uwmnafl/branch/master?svg=true
+)](https://ci.appveyor.com/api/projects/status/btgp1wgt0uwmnafl/branch/master)
 
 # SophosEndpoints
 
