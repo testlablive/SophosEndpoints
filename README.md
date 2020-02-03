@@ -1,7 +1,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/fwbrg250u8nc0rxc/branch/master?svg=true)](https://ci.appveyor.com/project/testlablive/sophosendpoints/branch/master)
 
 # SophosEndpoints
-========
 
 SophosEndpoints is a module to access updated information from the Office 365 IP Address and URL web service. It will create, update, or delete networks and web protection exceptions in Sophos UTM with these data to prioritize Microsoft 365 Urls for better access to the service.
 
