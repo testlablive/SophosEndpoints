@@ -9,7 +9,7 @@ SophosEndpoints is a module to access updated information from the Office 365 IP
 In order to create and maintain the networks and web protection exception in the Sophos UTM you need to create a local user account in the Sophos and create an API key mapped to this user.
 
 ```powershell
-# This will create networks and an exception for the Office 365 tenatn 'testlab'. The results will be logged and saved at C:\Set-EndpointsInUtm.log
+# This will create networks and an exception for the Office 365 tenant 'testlab'. The results will be logged and saved at C:\Set-EndpointsInUtm.log
 Set-EndpointsInUtm -UtmApiUrl "https://sophos.testlab.live:4444/api" -UtmApiKey "kjAHGansdzyPdsYhmILKgOWsh" -TenantName testlab -LogFilePath "C:\Set-EndpointsInUtm.log"
 ```
 
