@@ -119,6 +119,8 @@ function Set-NetsInUtm
         [Object[]] $inWeb
     )
     
+    $response = ""
+
     if ($null -ne $inUtm)
     {
         $input = [System.Linq.Enumerable]::ToList([psobject[]]$inUtm)
@@ -130,15 +132,17 @@ function Set-NetsInUtm
 
     foreach($netAdd in $toAdd)
     {
-        return Add-NetToUtm -netToAdd $netAdd
+        $response += Add-NetToUtm -netToAdd $netAdd
         Start-Sleep -Seconds 1
     }
     
     foreach($netDelete in $toDelete)
     {
-        return Remove-NetFromUtm -netToDelete $netDelete
+        $response += Remove-NetFromUtm -netToDelete $netDelete
         Start-Sleep -Seconds 1
     }
+
+    return $response
 }
 
 function Set-EndpointsInUtm
@@ -244,17 +248,29 @@ function Set-EndpointsInUtm
     $script:commentException = $UtmExceptionPrefix + " autocreated on " + (Get-Date).ToString("yyyy-MM-dd")
     $script:tokenBase64 = [Convert]::ToBase64String([System.Text.Encoding]::Default.GetBytes("token:" + $UtmApiKey))
     $script:log = ""
-
+	
+	if($script:headers.'Accept') {
+		$script:headers.Remove('Accept') >$null
+	}
     $script:headers.add("Accept", "application/json")
+	if($script:headers.'Content-Type') {
+		$script:headers.Remove('Content-Type') >$null
+	}
     $script:headers.add("Content-Type", "application/json")
+	if($script:headers.'X-Restd-Err-Ack') {
+		$script:headers.Remove('X-Restd-Err-Ack') >$null
+	}
     $script:headers.add("X-Restd-Err-Ack", "all")
+	if($script:headers.'Authorization') {
+		$script:headers.Remove('Authorization') >$null
+	}
     $script:headers.add("Authorization","Basic " + $tokenBase64)
 
     # Retrieve the list of nets from sophos
     $netsSophos = Get-NetsFromUtm
 
     # Retrieve the list of nets from web
-    $endpoints = Get-Content -Raw -Path endpoints.json | ConvertFrom-Json
+    $endpoints = Get-Endpoints
     $ips = Get-Ips $endpoints
     $netsWeb = Get-NetsFromWeb $ips | convertto-json | convertfrom-json
 

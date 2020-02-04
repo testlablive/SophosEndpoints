@@ -18,7 +18,7 @@ If you run the above cmdlet again, it will compare the existing ressources in So
 
 You can automate this by creating a scheduled task.
 
-For detailed information on how to configure the Sophos UTM and the scheduled task visit [testlab.live](https://testlab.live)
+For detailed information on how to configure the Sophos UTM and the scheduled task visit [testlab.live/auto-update-sophos-utm-with-microsoft-endpoints](https://www.testlab.live/auto-update-sophos-utm-with-microsoft-endpoints/)
 
 ## Initial SophosEndpoints setup
 
