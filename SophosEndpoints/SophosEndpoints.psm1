@@ -5,6 +5,7 @@
 $baseServiceUrl = "https://endpoints.office.com/endpoints/Worldwide/?ClientRequestId={b10c5ed1-bad1-445f-b386-b919946339a7}"
 $exceptionUrl = "/objects/http/exception/"
 $networkUrl = "/objects/network/network/"
+$netsGroupUrl = "/objects/network/group/"
 $commentIp = " autocreated on " + (Get-Date).ToString("yyyy-MM-dd")
 $commentException = " autocreated on " + (Get-Date).ToString("yyyy-MM-dd")
 $tokenBase64 = [Convert]::ToBase64String([System.Text.Encoding]::Default.GetBytes("token:" + "dummytoken"))
@@ -43,6 +44,14 @@ function Get-NetsFromUtm
     $m365NetList = $utmNetList | Where-Object {$_.comment -like $UtmIpPrefix + '*' -and $_.name -like $UtmIpPrefix + '*'}
 
     return $m365NetList;
+}
+
+function Get-NetsGroupFromUtm
+{
+    $utmNetList = Invoke-RestMethod -Uri $netsGroupUrl -Method Get -Headers $headers
+    $netsGroup = $utmNetList | Where-Object {$_.comment -like $UtmIpPrefix + '*' -and $_.name -like $UtmIpPrefix + '*'}
+
+    return $netsGroup;
 }
 
 function Remove-NetFromUtm
@@ -106,6 +115,79 @@ function Set-ExceptionPost
     $body = $exception | convertto-json -compress
     $response = Invoke-RestMethod -Uri $exceptionUrl -Method Post -Headers $headers -Body $body | convertto-json
     return (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") + " - Creating Exception:`r`n" + $response
+}
+
+function Set-NetsGroupUtm
+{
+    param(
+        [Parameter(Mandatory = $false)]
+        [Object] $group,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [Object[]] $nets
+    )
+
+    if($null -eq $group)
+    {
+        return Set-NetsGroupPost -nets $nets
+    }
+    else {
+        return Set-NetsGroupPatch -group $group -nets $nets
+    }
+}
+
+function Set-NetsGroupPatch
+{
+    param(
+        [Parameter(Mandatory = $false)]
+        [Object] $group,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [Object[]] $nets
+    )
+
+    $netsGroupUrlPatch = $netsGroupUrl + $group._ref
+
+    $members = @()
+    foreach($net in $nets)
+    {
+        $members = $members += $net._ref
+    }
+
+    $group = [ordered]@{comment = $commentIp;
+        name = $UtmIpPrefix + " - All Nets Group";
+        members = $members}
+
+    $body = $group | convertto-json -compress
+    
+    $response = Invoke-RestMethod -Uri $netsGroupUrlPatch -Method Patch -Headers $headers -Body $body | convertto-json
+    return (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") + " - Patching existing Network Group:`r`n" + $response
+}
+
+function Set-NetsGroupPost
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject] $nets
+    )
+
+    $members = @()
+    foreach($net in $nets)
+    {
+        $members = $members += $net._ref
+    }
+
+    $group = [ordered]@{comment = $commentIp;
+        name = $UtmIpPrefix + " - All Nets Group";
+        members = $members}
+
+    $body = $group | convertto-json -compress
+
+    $response = Invoke-RestMethod -Uri $netsGroupUrl -Method Post -Headers $headers -Body $body | convertto-json
+    return (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") + " - Creating Network Group:`r`n" + $response
 }
 
 function Set-NetsInUtm
@@ -244,6 +326,7 @@ function Set-EndpointsInUtm
     $script:baseServiceUrl = "https://endpoints.office.com/endpoints/$Instance/?ClientRequestId={$ClientRequestId}"
     $script:exceptionUrl = $UtmApiUrl + "/objects/http/exception/"
     $script:networkUrl = $UtmApiUrl + "/objects/network/network/"
+    $script:netsGroupUrl = $UtmApiUrl + "/objects/network/group/"
     $script:commentIp = $UtmIpPrefix + " autocreated on " + (Get-Date).ToString("yyyy-MM-dd")
     $script:commentException = $UtmExceptionPrefix + " autocreated on " + (Get-Date).ToString("yyyy-MM-dd")
     $script:tokenBase64 = [Convert]::ToBase64String([System.Text.Encoding]::Default.GetBytes("token:" + $UtmApiKey))
@@ -282,6 +365,22 @@ function Set-EndpointsInUtm
     else
     {
         $log += Set-NetsInUtm -inUtm $netsSophos -inWeb $netsWeb
+    }
+
+    # Retrieve the list of nets from sophos
+    $netsSophos = Get-NetsFromUtm
+
+    # Retrieve nets group from sophos
+    $netsGroupSophos = Get-NetsGroupFromUtm
+
+    # Update nets group in sophos
+    if ($null -eq $netsGroupSophos)
+    {
+        $log += Set-NetsGroupUtm -nets $netsSophos
+    }
+    else
+    {
+        $log += Set-NetsGroupUtm -group $netsGroupSophos -nets $netsSophos
     }
 
     # Retrieve web protection exception from sophos
