@@ -5,7 +5,7 @@ RootModule = 'SophosEndpoints.psm1'
 
 # Version number of this module.
 # Viewing the source in GitHub? This version is updated in the build process and does not reflect the actual version
-ModuleVersion = '1.0.0'
+ModuleVersion = '1.0.1'
 
 # ID used to uniquely identify this module
 GUID = '8d899e76-c817-46b8-a70d-c0315619239a'
@@ -95,7 +95,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Stable version.'
+        ReleaseNotes = 'Added network group object in UTM.'
 
     } # End of PSData hashtable
 
